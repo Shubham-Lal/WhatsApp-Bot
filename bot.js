@@ -1,45 +1,57 @@
+const express = require('express');
+const app = express();
 require('dotenv').config();
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
-const client = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: {
-        headless: true,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ],
-    }
-});
+try {
+    const client = new Client({
+        authStrategy: new LocalAuth(),
+        puppeteer: {
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox'
+            ],
+        }
+    });
 
-client.on('qr', qr => {
-    qrcode.generate(qr, { small: true });
-});
+    client.on('qr', qr => {
+        qrcode.generate(qr, { small: true });
+    });
 
-client.on('ready', () => {
-    console.log('Client is ready!');
-});
+    client.on('ready', () => {
+        console.log('Client is ready!');
+    });
 
-client.on('message', async message => {
-    if (message.from !== process.env.WHATSAPP_GROUP_ID) return;
+    client.on('message', async message => {
+        // if (message.from !== process.env.WHATSAPP_GROUP_ID) return;
 
-    const contact = await message.getContact();
-    const name = contact.pushname?.split(" ")[0];
+        const contact = await message.getContact();
+        const name = contact.pushname?.split(" ")[0];
 
-    const msg = message.body.toLowerCase();
+        const msg = message.body.toLowerCase();
 
-    switch (true) {
-        case containsGreeting(msg):
-            message.reply(`hii ${name}`);
-            break;
-        default:
-            break;
-    }
-});
+        switch (true) {
+            case containsGreeting(msg):
+                message.reply(`hii ${name}`);
+                break;
+            default:
+                break;
+        }
+    });
 
-client.initialize();
+    client.initialize();
 
-const containsGreeting = (msg) => {
-    return msg.includes("hello") || msg.includes("hi") || msg.includes("hey");
-};
+    app.get('/', (req, res) => {
+        res.send('Online👌')
+    })
+    const PORT = process.env.PORT || 8000
+    app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
+    const containsGreeting = (msg) => {
+        return msg.includes("hello") || msg.includes("hi") || msg.includes("hey");
+    };
+} catch (error) {
+    console.log(error);
+}
