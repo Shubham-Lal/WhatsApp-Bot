@@ -3,8 +3,10 @@ const app = express();
 require('dotenv').config();
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const locateChrome = require('locate-chrome');
 
 try {
+    const executablePath = await new Promise(resolve => locateChrome(arg => resolve(arg)));
     const client = new Client({
         authStrategy: new LocalAuth(),
         puppeteer: {
@@ -13,7 +15,7 @@ try {
                 '--no-sandbox',
                 '--disable-setuid-sandbox'
             ],
-            executablePath: '/usr/bin/google-chrome',
+            executablePath: executablePath
         }
     });
 
@@ -35,7 +37,7 @@ try {
 
         switch (true) {
             case containsGreeting(msg):
-                message.reply(`hii ${name}`);
+                message.reply(`hii ${name}, how was your day?`);
                 break;
             default:
                 break;
