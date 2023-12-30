@@ -13,6 +13,7 @@ try {
                 '--no-sandbox',
                 '--disable-setuid-sandbox'
             ],
+            executablePath: '/usr/bin/google-chrome',
         }
     });
 
@@ -44,9 +45,9 @@ try {
     client.initialize();
 
     app.get('/', (req, res) => {
-        res.send('Online👌')
+        res.send('Online👌');
     })
-    const PORT = process.env.PORT || 8000
+    const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
     const containsGreeting = (msg) => {
